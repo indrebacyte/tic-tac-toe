@@ -1,32 +1,53 @@
 # coding=utf-8
+print("Let's play a game.\n")
+BOARD = []
+
+
+def create_board():
+    # create the board
+    while size > 3 or size < 5:
+        try:
+            size = int(input("What size should the game be? (3-5): "))
+        except ValueError:
+            print("Oops! seems like that is not a number. Try again...")
+            continue
+        if size < 3 or size > 5:
+            print("Oops! seems like those numbers are not within limits. Try again...")
+            continue
+        break
+
+    for i in range(size):
+        BOARD.append([])
+        for j in range(size):
+            BOARD[i].append('_')
+
+
 def game_loop():
     # The game should run until we return
+    game_turn = 0
     while True:
         print_board()
 
-        current_player = get_current_player()
+        # who's turn is it
+        current_player = get_current_player(game_turn)
+        print("It is " + current_player + "'s turn\n")
 
         coordinates = get_coordinates()
 
         place_token(current_player, coordinates[0], coordinates[1])
 
+        print(did_win(current_player))
         if did_win(current_player):
             print('{} has won the game 🏅'.format(current_player))
             return
 
-        elif is_board_full():
-            # Game over baby
-            print('The board is full and nobody won')
+        elif is_board_full(game_turn):
+            print("The game is over. No winners!")
             return
+
         else:
             print("Nobody has won yet, keep looping")
-
-
-BOARD = [
-    ['-', '-', '-'],
-    ['-', '-', '-'],
-    ['-', '-', '-']
-]
+            game_turn += 1
 
 
 def print_board():
@@ -34,9 +55,11 @@ def print_board():
         print(row)
 
 
-def get_current_player():
-    current_player = raw_input('whose turn is it?\n')
-    return current_player
+def get_current_player(num):
+    if num % 2 == 0:
+        return "X"
+    else:
+        return "O"
 
 
 def get_coordinates():
@@ -53,27 +76,66 @@ def get_coordinates():
     return [x_coord-1, y_coord-1]
 
 
+def is_valid_input(coordinate):
+    if not coordinate.isdigit():
+        return False
+    # Note the int(coordinate).
+    # We need to cast to Int before 
+    if not int(coordinate) in range(0, len(BOARD)):
+        return False
+
+    # All is well
+    return True
+
+
 def place_token(token, x_coord, y_coord):
     BOARD[x_coord][y_coord] = token
 
 
 def did_win(player):
     player_has_won = False
+
+    '#test rows'
     for row in BOARD:
-        if row[0] == player and row[1] == player and row[2] == player:
+        if same_token_in_row(player, row):
             player_has_won = True
 
+    '#test column'
+    for i in range(len(BOARD)):
+            column = []
+            for x in BOARD:
+                column.append(x[i])
+            if same_token_in_row(player, column):
+                player_has_won = True
+
+    '#test diagonal'
+    x_test2 = []
+    y_test2 = []
+    for i in range(len(BOARD)):
+        x_test = BOARD[i]
+        x_test2.append(x_test[i])
+
+        y_test = BOARD[i]
+        y_test2.append(y_test[-(i+1)])
+
+    if same_token_in_row(player, x_test2) or same_token_in_row(player, y_test2):
+        player_has_won = True
 
     return player_has_won
 
 
-def is_board_full():
-    board_is_full = True
-    for row in BOARD:
-        if row[0] == '-' or row[1] == '-' or row[2] == '-':
-            board_is_full = False
+def same_token_in_row(player, row):
+    tokens_in_row = 0
 
-    return board_is_full
+    for y in row:
+        if y == player:
+            tokens_in_row += 1
+
+    return tokens_in_row == len(row)
+
+
+def is_board_full(game_turn):
+    return game_turn == len(BOARD)**2
 
 
 def is_legal_move(token, x_coord, y_coord):
@@ -82,4 +144,5 @@ def is_legal_move(token, x_coord, y_coord):
 
 
 # Run the program
+create_board()
 game_loop()
