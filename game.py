@@ -40,17 +40,17 @@ def get_current_player():
 
 
 def get_coordinates():
-    x_coord = raw_input('which column?\n')
-    while not x_coord.isdigit():
-        x_coord = raw_input('please input an integer?\n')
-    while x_coord not in range(0,len(BOARD)):
-        x_coord = int(raw_input('please select a valid column?\n'))
-    y_coord = raw_input('which row?\n')
-    while not y_coord.isdigit():
-        y_coord = raw_input('please input an integer?\n')
-    while y_coord not in range(0,len(BOARD)):
-        y_coord = int(raw_input('please select a valid row?\n'))
-    return [x_coord, y_coord]
+    x_coord = int(raw_input('which column?\n'))
+    while x_coord not in range(1,len(BOARD)+1) and x_coord.isdigit():
+
+        x_coord = int(raw_input('please select a valid column that is an integer between 1 and 3?\n'))
+
+    y_coord = int (raw_input('which row?\n'))
+    while y_coord not in range(1,len(BOARD)+1):
+
+        y_coord = int(raw_input('please select a valid row that is an integer between 1 and 3?\n'))
+        print x_coord
+    return [x_coord-1, y_coord-1]
 
 
 def place_token(token, x_coord, y_coord):
@@ -62,6 +62,7 @@ def did_win(player):
     for row in BOARD:
         if row[0] == player and row[1] == player and row[2] == player:
             player_has_won = True
+
 
     return player_has_won
 
